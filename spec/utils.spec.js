@@ -1,4 +1,4 @@
-NODE_ENV = 'test'
+NODE_ENV = 'test';
 const { expect } = require('chai');
 const {
   formatDates,
@@ -230,8 +230,61 @@ describe('formatComments', () => {
       article_id: 4,
       author: 'grumpy19',
       votes: 7,
-      created_at: 1478813209256,
+      created_at: new Date(1478813209256),
     }];
     expect(formatComments(input, ref)).to.eql(expected)
+  })
+  it('should take an array containing more than two objects and format the correct keys for each', () => {
+    const input = [{
+      comment_id: 1,
+      body: 'Nobis consequatur animi. Ullam nobis quaerat voluptates veniam.',
+      belongs_to: 'Making sense of Redux',
+      created_by: 'grumpy19',
+      votes: 7,
+      created_at: 1478813209256,
+
+    }, {
+      comment_id: 2,
+      body: 'Nobis consequatur animi. Ullam nobis quaerat voluptates veniam.',
+      belongs_to: 'Making sense of Redux',
+      created_by: 'grumpy19',
+      votes: 7,
+      created_at: 1478813209257,
+    }, {
+      comment_id: 3,
+      body: 'Nobis consequatur animi. Ullam nobis quaerat voluptates veniam.',
+      belongs_to: '22 Amazing open source React projects',
+      created_by: 'grumpy19',
+      votes: 7,
+      created_at: 1478813209257,
+    }];
+    const ref = { 'Making sense of Redux': 4, "22 Amazing open source React projects": 3 };
+    expect(formatComments(input, ref)[1]).to.have.keys('comment_id',
+      'body',
+      'article_id',
+      'author',
+      'votes',
+      'created_at')
+    expect(formatComments(input, ref).length).to.equal(3)
+  })
+  it('should also pass the cereated_at unix format into a javascirpt object', () => {
+    const input = [{
+      comment_id: 1,
+      body: 'Nobis consequatur animi. Ullam nobis quaerat voluptates veniam.',
+      belongs_to: 'Making sense of Redux',
+      created_by: 'grumpy19',
+      votes: 7,
+      created_at: 1478813209257,
+    }];
+    const ref = { 'Making sense of Redux': 4 }
+    const expected = [{
+      comment_id: 1,
+      body: 'Nobis consequatur animi. Ullam nobis quaerat voluptates veniam.',
+      article_id: 4,
+      author: 'grumpy19',
+      votes: 7,
+      created_at: new Date(1478813209257),
+    }];
+    expect(formatDates(input, ref)[0].created_at).to.eql(expected[0].created_at)
   })
 });

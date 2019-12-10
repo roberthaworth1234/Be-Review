@@ -23,12 +23,15 @@ exports.formatComments = (comments, articleRef) => {
   if (!comments.length) return [];
   else {
     const newArray = [];
-    const commentsCopy = { ...comments[0] }
-    commentsCopy.author = comments[0].created_by;
-    commentsCopy.article_id = articleRef[comments[0].belongs_to]
-    delete commentsCopy.belongs_to;
-    delete commentsCopy.created_by;
-    newArray.push(commentsCopy)
+    comments.forEach(obj => {
+      const commentsCopy = { ...obj }
+      commentsCopy.author = obj.created_by;
+      commentsCopy.article_id = articleRef[obj.belongs_to]
+      commentsCopy.created_at = new Date(obj.created_at)
+      delete commentsCopy.belongs_to;
+      delete commentsCopy.created_by;
+      newArray.push(commentsCopy)
+    })
     return (newArray)
   }
 };
