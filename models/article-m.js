@@ -1,16 +1,49 @@
-const connection = require('../db/connection')
+const connection = require("../db/connection");
 
-const fetchArticleById = (article_id) => {
-  return connection('articles').where('article_id', "=", article_id).returning().then((result) => {
-    if (!result.length) return Promise.reject({ status: 404, msg: "article does not exist" })
-    else {
+const fetchArticleById = article_id => {
+  return connection
+    .select("articles.*")
+    .from("articles")
+    .count({ comment_count: "comment_id" })
+    .leftJoin("comments", "comments.article_id", "articles.article_id")
+    .groupBy("articles.article_id")
+    .where("articles.article_id", "=", article_id)
+    .then(result => {
+      if (!result.length)
+        return Promise.reject({ status: 404, msg: "article does not exist" });
+      else {
+        return result;
+      }
+    });
+};
+
+const updateArticleById = (article_id, value = 0) => {
+  if (typeof value === "string")
+    return Promise.reject({ status: 400, msg: "Invalid inc_votes value" });
+  if (!value)
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid patch value, bad request"
+    });
+  else {
+    return connection("articles")
+      .where("articles.article_id", "=", article_id)
+      .increment("votes", value)
+      .returning("*")
+      .then(result => {
+        return result;
+      });
+  }
+};
+
+const addCommentByArticleId = (article_id, postValue) => {
+  const { username, body } = postValue;
+  return connection("comments")
+    .insert([{ author: username, body: body, article_id: article_id }])
+    .returning("*")
+    .then(result => {
       return result;
-    }
-  })
-}
+    });
+};
 
-const updateArticleById = (article_id, body) => {
-  return connection('articles').where("article_id", "=", article_id).update(body).returning()
-}
-
-module.exports = { fetchArticleById, updateArticleById };
+module.exports = { fetchArticleById, updateArticleById, addCommentByArticleId };
