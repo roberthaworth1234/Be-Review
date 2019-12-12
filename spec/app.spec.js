@@ -1,8 +1,13 @@
 process.env.NODE_ENV = "test";
 const request = require("supertest");
-const { expect } = require("chai");
 const app = require("../app");
+const chai = require("chai");
+const chaiSorted = require("chai-sorted");
+
 const connection = require("../db/connection");
+
+const { expect } = require("chai");
+chai.use(chaiSorted);
 
 describe("app", () => {
   beforeEach(() => connection.seed.run());
@@ -70,6 +75,7 @@ describe("app", () => {
               "votes",
               "comment_count"
             ]);
+            expect(response.body.article.length).to.equal(1);
           });
       });
       it("GET ERROR: 404 sends an appropriate message when a valid but non-existent id is used", () => {
@@ -96,7 +102,6 @@ describe("app", () => {
           })
           .expect(200)
           .then(response => {
-            // console.log(response)
             expect(response.body.article[0]).to.have.keys(
               "votes",
               "article_id",
@@ -184,6 +189,223 @@ describe("app", () => {
           .then(response => {
             expect(response.body.msg).to.equal("Article Id Invalid");
           });
+      });
+      it("GET 200: should return the comments relating to specific article id", () => {
+        return request(app)
+          .get("/api/articles/9/comments")
+          .expect(200)
+          .then(response => {
+            expect(response.body.comments[0]).to.have.keys(
+              "comment_id",
+              "author",
+              "article_id",
+              "votes",
+              "created_at",
+              "body"
+            );
+            expect(response.body.comments).to.have.lengthOf(2);
+            expect(response.body.comments[0].created_at).to.equal(
+              "2017-11-22T12:36:03.389Z"
+            );
+          });
+      });
+      it("GET QUERY 200: should sortBy column name passed in the query", () => {
+        return request(app)
+          .get("/api/articles/9/comments?sort_by=author")
+          .expect(200)
+          .then(response => {
+            expect(response.body.comments).to.be.sortedBy("author", {
+              descending: true
+            });
+          });
+      });
+      it("GET QUERY 200: should be able to sort comments descending using an order query", () => {
+        return request(app)
+          .get("/api/articles/9/comments?order=asc")
+          .expect(200)
+          .then(response => {
+            expect(response.body.comments).to.be.sortedBy("created_at", {
+              descending: false
+            });
+          });
+      });
+      it("GET QUERY 200: should be able to sort a specific comment by column and spicifying which order", () => {
+        return request(app)
+          .get("/api/articles/9/comments?sort_by=author&&order=desc")
+          .expect(200)
+          .then(response => {
+            expect(response.body.comments).to.be.sortedBy("author", {
+              descending: true
+            });
+          });
+      });
+      it("GET QUERY 200: if passed an incorrect key name in the query, should sort by the default created_at", () => {
+        return request(app)
+          .get("/api/articles/9/comments?sort_b=author")
+          .expect(200)
+          .then(response => {
+            expect(response.body.comments).to.be.sortedBy("created_at", {
+              descending: true
+            });
+          });
+      });
+      it("GET QUERY ERROR 400: if passed an incorrect value into the query, should return with not found", () => {
+        return request(app)
+          .get("/api/articles/9/comments?sort_by=auth")
+          .expect(400)
+          .then(response => {
+            expect(response.body.msg).to.equal("Query Request Invalid");
+          });
+      });
+      it("GET QUERY 200: should still sortby author if order value is incorrectly passed", () => {
+        return request(app)
+          .get("/api/articles/1/comments?sort_by=author&order=ac")
+          .expect(200)
+          .then(response => {
+            expect(response.body.comments).to.be.sortedBy("author", {
+              descending: true
+            });
+          });
+      });
+      it("GET QUERY ERROR 400: should give a correct error when query built incorrectly", () => {
+        return request(app)
+          .get("/api/articles/1/comments?sort_by=authororder=asc")
+          .expect(400)
+          .then(response => {
+            expect(response.body.msg).to.equal("Query Request Invalid");
+          });
+      });
+      describe("article ?queries", () => {
+        it("GET 200: should articles by valid column, defaulting to the date column", () => {
+          return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .then(response => {
+              expect(response.body.articles[0]).to.have.keys(
+                "author",
+                "article_id",
+                "topic",
+                "created_at",
+                "body",
+                "votes",
+                "comment_count",
+                "title"
+              );
+              expect(response.body.articles.length).to.equal(12);
+            });
+        });
+        it("GET QUERY 200: returns all articles and sort by the queried column", () => {
+          return request(app)
+            .get("/api/articles?sort_by=author")
+            .expect(200)
+            .then(response => {
+              expect(response.body.articles).to.be.sortedBy("author", {
+                descending: true
+              });
+            });
+        });
+        it("GET QUERY 200: returns all articles in the correct order, defaulting to use created_at", () => {
+          return request(app)
+            .get("/api/articles?order=asc")
+            .expect(200)
+            .then(response => {
+              expect(response.body.articles).to.be.sortedBy("created_at", {
+                descending: false
+              });
+            });
+        });
+        it("GET QUERY 200: returns all articles in the correct order that is passed and the column passed", () => {
+          return request(app)
+            .get("/api/articles?sort_by=topic&order=asc")
+            .expect(200)
+            .then(response => {
+              expect(response.body.articles).to.be.sortedBy("topic", {
+                descending: false
+              });
+            });
+        });
+        it("GET QUERY 200: should return all articles specified by the author username", () => {
+          return request(app)
+            .get("/api/articles?author=rogersop")
+            .expect(200)
+            .then(response => {
+              expect(response.body.articles.length).to.equal(3);
+              expect(response.body.articles[0].author).to.equal("rogersop");
+            });
+        });
+        it("GET QUERY 200: should return all articles specified by the topics", () => {
+          return request(app)
+            .get("/api/articles?topic=cats")
+            .expect(200)
+            .then(response => {
+              expect(response.body.articles.length).to.equal(1);
+            });
+        });
+        it("GET QUERY 200: should give correct empty array when author requested who has written no articles", () => {
+          return request(app)
+            .get("/api/articles?author=lurker")
+            .expect(200)
+            .then(response => {
+              expect(response.body.articles).to.eql([]);
+            });
+        });
+        it("GET QUERY ERROR 404: should give correct error when author is not a valid user", () => {
+          return request(app)
+            .get("/api/articles?author=luker")
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.eql("User Not Found");
+            });
+        });
+        it("GET QUERY ERROR 404: should give correct error when topic is not valid/present", () => {
+          return request(app)
+            .get("/api/articles?topic=wrong")
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.eql("Topic Not Found");
+            });
+        });
+        it("GET QUERY ERROR 404: should give correct error when topic is given as a number", () => {
+          return request(app)
+            .get("/api/articles?topic=12")
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.eql("Topic Not Found");
+            });
+        });
+        it("GET QUERY ERROR 404: should give correct error when author is given as a number instead of a string", () => {
+          return request(app)
+            .get("/api/articles?author=2")
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.eql("User Not Found");
+            });
+        });
+      });
+      describe.only("/comments/comments:id", () => {
+        it("PATCH 200: should increment a comments vote by 1", () => {
+          return request(app)
+            .patch("/api/comments/2")
+            .send({ inc_votes: 1 })
+            .expect(200)
+            .then(response => {
+              expect(response.body.comment[0]).to.have.keys(
+                "votes",
+                "article_id",
+                "author",
+                "body",
+                "created_at",
+                "comment_id"
+              );
+              expect(response.body.comment.length).to.equal(1);
+              expect(response.body.comment[0].votes).to.equal(15);
+            });
+        });
+        it("DELETE 204: should give a 204 no content when comment is deleted by id", () => {
+          return request(app)
+            .delete("/api/comments/2")
+            .expect(204);
+        });
       });
     });
   });

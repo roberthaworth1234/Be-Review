@@ -30,7 +30,11 @@ app.use((err, req, res, next) => {
     res.status(400).send({ msg: "Article Id Invalid" });
   } else if (err.code === "22P02") {
     res.status(400).send({ msg: "Invalid id" });
-  } else if (err.status) return res.status(err.status).send({ msg: err.msg });
+  } else if ((err.code = "42703")) {
+    res.status(400).send({ msg: "Query Request Invalid" });
+  } else if (err.status) {
+    res.status(err.status).send({ msg: err.msg });
+  } else console.log(err);
 });
 
 module.exports = app;
