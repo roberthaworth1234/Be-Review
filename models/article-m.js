@@ -13,7 +13,7 @@ const fetchArticleById = article_id => {
       if (!result.length)
         return Promise.reject({ status: 404, msg: "article does not exist" });
       else {
-        return result;
+        return result[0];
       }
     });
 };
@@ -21,18 +21,13 @@ const fetchArticleById = article_id => {
 const updateArticleById = (article_id, value = 0) => {
   if (typeof value === "string")
     return Promise.reject({ status: 400, msg: "Invalid inc_votes value" });
-  if (!value)
-    return Promise.reject({
-      status: 400,
-      msg: "Invalid patch value, bad request"
-    });
   else {
     return connection("articles")
       .where("articles.article_id", "=", article_id)
       .increment("votes", value)
       .returning("*")
       .then(result => {
-        return result;
+        return result[0];
       });
   }
 };
@@ -43,7 +38,7 @@ const addCommentByArticleId = (article_id, postValue) => {
     .insert([{ author: username, body: body, article_id: article_id }])
     .returning("*")
     .then(result => {
-      return result;
+      return result[0];
     });
 };
 
@@ -57,6 +52,8 @@ const fetchCommentsByArticleId = (
     .where("article_id", "=", article_id)
     .orderBy(sort_by, order)
     .then(result => {
+      if (!result.length)
+        return checkExists((author = 0), (topic = 0), article_id);
       return result;
     });
 };

@@ -3,11 +3,6 @@ const connection = require("../db/connection");
 const updateCommentById = (comment_id, value = 0) => {
   if (typeof value === "string")
     return Promise.reject({ status: 400, msg: "Invalid inc_votes value" });
-  if (!value)
-    return Promise.reject({
-      status: 400,
-      msg: "Invalid patch value, bad request"
-    });
   else {
     return connection
       .select("comments")
@@ -16,6 +11,8 @@ const updateCommentById = (comment_id, value = 0) => {
       .increment("votes", value)
       .returning("*")
       .then(result => {
+        if (!result.length)
+          return Promise.reject({ status: 404, msg: "Invalid Comment Id" });
         return result[0];
       });
   }

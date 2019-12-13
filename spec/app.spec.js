@@ -14,6 +14,14 @@ describe("app", () => {
   after(() => connection.destroy());
 
   describe("/api", () => {
+    it("GET 200: get Api paths in JSON", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then(response => {
+          expect(response.body).to.be.an("object");
+        });
+    });
     describe("/topics", () => {
       it("INVALID METHODS: STATUS 405", () => {
         const invalidMethods = ["patch", "put", "delete", "post"];
@@ -113,7 +121,7 @@ describe("app", () => {
           .get("/api/articles/1")
           .expect(200)
           .then(response => {
-            expect(response.body.article[0]).to.have.keys([
+            expect(response.body.article).to.have.keys([
               "article_id",
               "title",
               "topic",
@@ -123,7 +131,8 @@ describe("app", () => {
               "votes",
               "comment_count"
             ]);
-            expect(response.body.article.length).to.equal(1);
+            expect(response.body.article.article_id).to.have.equal(1);
+            expect(response.body.article.comment_count).to.equal("13");
           });
       });
       it("GET ERROR: 404 sends an appropriate message when a valid but non-existent id is used", () => {
@@ -150,7 +159,7 @@ describe("app", () => {
           })
           .expect(200)
           .then(response => {
-            expect(response.body.article[0]).to.have.keys(
+            expect(response.body.article).to.have.keys(
               "votes",
               "article_id",
               "author",
@@ -159,17 +168,24 @@ describe("app", () => {
               "title",
               "topic"
             );
-            expect(response.body.article.length).to.equal(1);
-            expect(response.body.article[0].votes).to.equal(5);
+            expect(response.body.article.votes).to.equal(5);
           });
       });
-      it("PATCH ERROR: 400 sends the appropriate error message when passed an valid id,  but invalid patch", () => {
+      it("PATCH: 200 ignores a patch request when no information sent in the patch body, returns article unchanged", () => {
         return request(app)
           .patch("/api/articles/3")
-          .expect(400)
-          .send({ in_votes: 2 })
+          .expect(200)
+          .send({})
           .then(res => {
-            expect(res.body.msg).to.equal("Invalid patch value, bad request");
+            expect(res.body.article).to.eql({
+              article_id: 3,
+              title: "Eight pug gifs that remind me of mitch",
+              topic: "mitch",
+              author: "icellusedkars",
+              body: "some gifs",
+              created_at: "2010-11-17T12:21:54.171Z",
+              votes: 0
+            });
           });
       });
       it('PATCH ERROR: 400 correct message when inc_votes is included, but as a invalid value (i.e. "string")', () => {
@@ -187,7 +203,7 @@ describe("app", () => {
           .expect(200)
           .send({ inc_votes: 4, name: "Bob" })
           .then(res => {
-            expect(res.body.article[0].votes).to.equal(4);
+            expect(res.body.article.votes).to.equal(4);
           });
       });
     });
@@ -206,14 +222,14 @@ describe("app", () => {
       });
       it("POST: 201 should accept a post object with username and body and post the comment", () => {
         return request(app)
-          .post("/api/articles/12/comments")
+          .post("/api/articles/1/comments")
           .send({
             username: "butter_bridge",
             body: "This comment is absolutely useless...But easy to spot"
           })
           .expect(201)
           .then(response => {
-            expect(response.body.comment[0]).to.have.keys(
+            expect(response.body.comment).to.have.keys(
               "comment_id",
               "author",
               "article_id",
@@ -221,9 +237,30 @@ describe("app", () => {
               "created_at",
               "body"
             );
-            expect(response.body.comment[0].body).to.equal(
+            expect(response.body.comment.body).to.equal(
               "This comment is absolutely useless...But easy to spot"
             );
+          });
+      });
+      it("POST ERROR: 400 bad request if post request does not contain all keys", () => {
+        return request(app)
+          .post("/api/articles/4/comments")
+          .send({ username: "jimmy" })
+          .expect(400)
+          .then(response => {
+            expect(response.body.msg).to.equal("Invalid Post Input");
+          });
+      });
+      it("POST ERROR: 404 should give correct response when a post contains a valid article_id that doesnt exist", () => {
+        return request(app)
+          .post("/api/articles/1000/comments")
+          .send({
+            username: "butter_bridge",
+            body: "This should not be posted as the article 1000 does not exist"
+          })
+          .expect(404)
+          .then(response => {
+            expect(response.body.msg).to.equal("Article Id Invalid");
           });
       });
       it("POST ERROR: 400 should give correct error when posting incorrect input object(i.e. non-existent user)", () => {
@@ -248,6 +285,14 @@ describe("app", () => {
           .expect(400)
           .then(response => {
             expect(response.body.msg).to.equal("Article Id Invalid");
+          });
+      });
+      it("GET 404: Not found message when given a valid but non-existent article_id", () => {
+        return request(app)
+          .get("/api/articles/10000/comments")
+          .expect(404)
+          .then(response => {
+            expect(response.body.msg).to.equal("article not found");
           });
       });
       it("GET 200: should return the comments relating to specific article id", () => {
@@ -414,7 +459,7 @@ describe("app", () => {
             .get("/api/articles?author=luker")
             .expect(404)
             .then(response => {
-              expect(response.body.msg).to.eql("User Not Found");
+              expect(response.body.msg).to.eql("user not found");
             });
         });
         it("GET QUERY ERROR 404: should give correct error when topic is not valid/present", () => {
@@ -422,7 +467,7 @@ describe("app", () => {
             .get("/api/articles?topic=wrong")
             .expect(404)
             .then(response => {
-              expect(response.body.msg).to.eql("Topic Not Found");
+              expect(response.body.msg).to.eql("topic not found");
             });
         });
         it("GET QUERY ERROR 404: should give correct error when topic is given as a number", () => {
@@ -430,7 +475,7 @@ describe("app", () => {
             .get("/api/articles?topic=12")
             .expect(404)
             .then(response => {
-              expect(response.body.msg).to.eql("Topic Not Found");
+              expect(response.body.msg).to.eql("topic not found");
             });
         });
         it("GET QUERY ERROR 404: should give correct error when author is given as a number instead of a string", () => {
@@ -438,7 +483,7 @@ describe("app", () => {
             .get("/api/articles?author=2")
             .expect(404)
             .then(response => {
-              expect(response.body.msg).to.eql("User Not Found");
+              expect(response.body.msg).to.eql("user not found");
             });
         });
       });
@@ -478,15 +523,22 @@ describe("app", () => {
               expect(response.body.comment.votes).to.equal(-99);
             });
         });
-        it("PATCH ERROR: 400 sends the appropriate error message when passed an valid id,  but invalid patch", () => {
+        it("PATCH 200: sends back the unchanged commen when no inc_votes property", () => {
           return request(app)
             .patch("/api/comments/3")
-            .expect(400)
+            .expect(200)
             .send({ in_votes: 2 })
             .then(response => {
-              expect(response.body.msg).to.equal(
-                "Invalid patch value, bad request"
-              );
+              expect(response.body.comment.votes).to.equal(100);
+            });
+        });
+        it("PATCH ERROR 404: should return correct error when patch contains a valid but non existent id", () => {
+          return request(app)
+            .patch("/api/comments/1001")
+            .send({ inc_votes: 2 })
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.equal("Invalid Comment Id");
             });
         });
         it("DELETE 204: should give a 204 no content when comment is deleted by id", () => {
@@ -516,6 +568,18 @@ describe("app", () => {
           const methodPromises = invalidMethods.map(method => {
             return request(app)
               [method]("/api/comments/1")
+              .expect(405)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Method is not allowed");
+              });
+          });
+          return Promise.all(methodPromises);
+        });
+        it("INVALID METHODS: STATUS 405", () => {
+          const invalidMethods = ["delete", "put", "post", "patch"];
+          const methodPromises = invalidMethods.map(method => {
+            return request(app)
+              [method]("/api")
               .expect(405)
               .then(({ body: { msg } }) => {
                 expect(msg).to.equal("Method is not allowed");

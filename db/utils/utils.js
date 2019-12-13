@@ -1,11 +1,9 @@
 exports.formatDates = list => {
-  const newArray = []
-  list.forEach(obj => {
+  return list.map(obj => {
     let newObj = { ...obj };
-    newObj.created_at = new Date(obj.created_at)
-    newArray.push(newObj);
-  })
-  return newArray
+    newObj.created_at = new Date(obj.created_at);
+    return newObj;
+  });
 };
 
 exports.makeRefObj = (list, key, value) => {
@@ -13,8 +11,8 @@ exports.makeRefObj = (list, key, value) => {
   else {
     const refObj = {};
     list.forEach(obj => {
-      refObj[obj[key]] = obj[value]
-    })
+      refObj[obj[key]] = obj[value];
+    });
     return refObj;
   }
 };
@@ -22,16 +20,14 @@ exports.makeRefObj = (list, key, value) => {
 exports.formatComments = (comments, articleRef) => {
   if (!comments.length) return [];
   else {
-    const newArray = [];
-    comments.forEach(obj => {
-      const commentsCopy = { ...obj }
+    return comments.map(obj => {
+      const commentsCopy = { ...obj };
       commentsCopy.author = obj.created_by;
-      commentsCopy.article_id = articleRef[obj.belongs_to]
-      commentsCopy.created_at = new Date(obj.created_at)
+      commentsCopy.article_id = articleRef[obj.belongs_to];
+      commentsCopy.created_at = new Date(obj.created_at);
       delete commentsCopy.belongs_to;
       delete commentsCopy.created_by;
-      newArray.push(commentsCopy)
-    })
-    return (newArray)
+      return commentsCopy;
+    });
   }
 };

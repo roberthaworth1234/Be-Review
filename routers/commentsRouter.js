@@ -3,13 +3,12 @@ const {
   patchCommentById,
   deleteCommentById
 } = require("../controllers/comments-c");
+const { methodNotAllowed } = require("../controllers/methodNotAllowed-c");
 
 commentRouter
   .route("/:comment_id")
   .patch(patchCommentById)
   .delete(deleteCommentById)
-  .all((req, res, next) => {
-    res.status(405).send({ msg: "Method is not allowed" });
-  });
+  .all(methodNotAllowed);
 
 module.exports = commentRouter;

@@ -1,32 +1,22 @@
 const connection = require("../db/connection");
 
-exports.checkExists = (author, topic) => {
-  if (author)
-    return connection
-      .select("username")
-      .from("users")
-      .where("username", "=", author)
+exports.checkExists = (author, topic, article_id) => {
+  const connectionFunc = (value, table, column) => {
+    return connection(table)
+      .where(column, "=", value)
       .then(result => {
         if (!result.length)
           return Promise.reject({
             status: 404,
-            msg: "User Not Found"
+            msg: `${table.substring(0, table.length - 1)} not found`
           });
         else {
           return [];
         }
       });
+  };
 
-  if (topic)
-    return connection
-      .select("slug")
-      .from("topics")
-      .where("slug", "=", topic)
-      .then(result => {
-        if (!result.length)
-          return Promise.reject({ status: 404, msg: "Topic Not Found" });
-        else {
-          return [];
-        }
-      });
+  if (author) return connectionFunc(author, "users", "username");
+  if (topic) return connectionFunc(topic, "topics", "slug");
+  if (article_id) return connectionFunc(article_id, "articles", "article_id");
 };

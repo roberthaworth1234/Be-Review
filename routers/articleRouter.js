@@ -6,28 +6,23 @@ const {
   getCommentsByArticleId,
   getArticles
 } = require("../controllers/article-c");
+const { methodNotAllowed } = require("../controllers/methodNotAllowed-c");
 
 articleRouter
   .route("/")
   .get(getArticles)
-  .all((req, res, next) => {
-    res.status(405).send({ msg: "Method is not allowed" });
-  });
+  .all(methodNotAllowed);
 
 articleRouter
   .route("/:article_id")
   .get(getArticleById)
   .patch(patchArticleById)
-  .all((req, res, next) => {
-    res.status(405).send({ msg: "Method is not allowed" });
-  });
+  .all(methodNotAllowed);
 
 articleRouter
   .route("/:article_id/comments")
   .post(postCommentByArticleId)
   .get(getCommentsByArticleId)
-  .all((req, res, next) => {
-    res.status(405).send({ msg: "Method is not allowed" });
-  });
+  .all(methodNotAllowed);
 
 module.exports = articleRouter;
