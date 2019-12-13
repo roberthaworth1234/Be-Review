@@ -16,7 +16,7 @@ const updateCommentById = (comment_id, value = 0) => {
       .increment("votes", value)
       .returning("*")
       .then(result => {
-        return result;
+        return result[0];
       });
   }
 };
@@ -26,7 +26,8 @@ const removeCommentById = comment_id => {
     .where("comment_id", comment_id)
     .del()
     .then(result => {
-      return result;
+      if (!result)
+        return Promise.reject({ status: 404, msg: "Comment Does Not Exist" });
     });
 };
 

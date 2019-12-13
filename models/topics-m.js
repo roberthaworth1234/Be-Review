@@ -1,9 +1,7 @@
-
-const connection = require('../db/connection')
+const connection = require("../db/connection");
 
 const fetchTopics = () => {
-  return connection('topics').returning()
-
+  return connection("topics");
 };
 
 module.exports = fetchTopics;

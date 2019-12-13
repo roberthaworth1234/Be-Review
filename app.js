@@ -18,15 +18,9 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  if (
-    err.code === "23503" &&
-    err.detail === 'Key (author)=(bobbio) is not present in table "users".'
-  ) {
+  if (err.code === "23503" && err.length === 262) {
     res.status(400).send({ msg: "User Invalid" });
-  } else if (
-    err.code === "23503" &&
-    err.detail === 'Key (article_id)=(15) is not present in table "articles".'
-  ) {
+  } else if (err.code === "23503" && err.length === 273) {
     res.status(400).send({ msg: "Article Id Invalid" });
   } else if (err.code === "22P02") {
     res.status(400).send({ msg: "Invalid id" });

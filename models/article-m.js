@@ -56,7 +56,6 @@ const fetchCommentsByArticleId = (
   return connection("comments")
     .where("article_id", "=", article_id)
     .orderBy(sort_by, order)
-    .returning("*")
     .then(result => {
       return result;
     });

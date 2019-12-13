@@ -15,6 +15,18 @@ describe("app", () => {
 
   describe("/api", () => {
     describe("/topics", () => {
+      it("INVALID METHODS: STATUS 405", () => {
+        const invalidMethods = ["patch", "put", "delete", "post"];
+        const methodPromises = invalidMethods.map(method => {
+          return request(app)
+            [method]("/api/topics")
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Method is not allowed");
+            });
+        });
+        return Promise.all(methodPromises);
+      });
       it("GET: 200 should return correct status and the topics", () => {
         return request(app)
           .get("/api/topics")
@@ -37,12 +49,24 @@ describe("app", () => {
       });
     });
     describe("/users/:username", () => {
+      it("INVALID METHODS: STATUS 405", () => {
+        const invalidMethods = ["patch", "put", "delete", "post"];
+        const methodPromises = invalidMethods.map(method => {
+          return request(app)
+            [method]("/api/users/butter_bridge")
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Method is not allowed");
+            });
+        });
+        return Promise.all(methodPromises);
+      });
       it("GET: 200 should get individual users by username", () => {
         return request(app)
           .get("/api/users/butter_bridge")
           .expect(200)
           .then(response => {
-            expect(response.body.user[0]).to.eql({
+            expect(response.body.user).to.eql({
               username: "butter_bridge",
               avatar_url:
                 "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
@@ -60,6 +84,30 @@ describe("app", () => {
       });
     });
     describe("articles", () => {
+      it("INVALID METHODS: STATUS 405", () => {
+        const invalidMethods = ["patch", "put", "delete", "post"];
+        const methodPromises = invalidMethods.map(method => {
+          return request(app)
+            [method]("/api/articles")
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Method is not allowed");
+            });
+        });
+        return Promise.all(methodPromises);
+      });
+      it("INVALID METHODS: STATUS 405", () => {
+        const invalidMethods = ["put", "delete", "post"];
+        const methodPromises = invalidMethods.map(method => {
+          return request(app)
+            [method]("/api/articles/3")
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Method is not allowed");
+            });
+        });
+        return Promise.all(methodPromises);
+      });
       it("GET: 200 should give correct status msg and response when getting articles by id", () => {
         return request(app)
           .get("/api/articles/1")
@@ -144,6 +192,18 @@ describe("app", () => {
       });
     });
     describe("articles/article_id/comments", () => {
+      it("INVALID METHODS: STATUS 405", () => {
+        const invalidMethods = ["put", "delete", "patch"];
+        const methodPromises = invalidMethods.map(method => {
+          return request(app)
+            [method]("/api/articles/3/comments")
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Method is not allowed");
+            });
+        });
+        return Promise.all(methodPromises);
+      });
       it("POST: 201 should accept a post object with username and body and post the comment", () => {
         return request(app)
           .post("/api/articles/12/comments")
@@ -382,14 +442,14 @@ describe("app", () => {
             });
         });
       });
-      describe.only("/comments/comments:id", () => {
+      describe("/comments/comments:id", () => {
         it("PATCH 200: should increment a comments vote by 1", () => {
           return request(app)
             .patch("/api/comments/2")
             .send({ inc_votes: 1 })
             .expect(200)
             .then(response => {
-              expect(response.body.comment[0]).to.have.keys(
+              expect(response.body.comment).to.have.keys(
                 "votes",
                 "article_id",
                 "author",
@@ -397,14 +457,71 @@ describe("app", () => {
                 "created_at",
                 "comment_id"
               );
-              expect(response.body.comment.length).to.equal(1);
-              expect(response.body.comment[0].votes).to.equal(15);
+              expect(response.body.comment.votes).to.equal(15);
+            });
+        });
+        it("PATCH 200: should decrement inc votes by -1 value", () => {
+          return request(app)
+            .patch("/api/comments/5")
+            .expect(200)
+            .send({ inc_votes: -1 })
+            .then(response => {
+              expect(response.body.comment.votes).to.equal(-1);
+            });
+        });
+        it("PATCH 200: should decrement inc votes by 1, even if orginal votes value is a negative value", () => {
+          return request(app)
+            .patch("/api/comments/4")
+            .expect(200)
+            .send({ inc_votes: 1 })
+            .then(response => {
+              expect(response.body.comment.votes).to.equal(-99);
+            });
+        });
+        it("PATCH ERROR: 400 sends the appropriate error message when passed an valid id,  but invalid patch", () => {
+          return request(app)
+            .patch("/api/comments/3")
+            .expect(400)
+            .send({ in_votes: 2 })
+            .then(response => {
+              expect(response.body.msg).to.equal(
+                "Invalid patch value, bad request"
+              );
             });
         });
         it("DELETE 204: should give a 204 no content when comment is deleted by id", () => {
           return request(app)
             .delete("/api/comments/2")
             .expect(204);
+        });
+        it('PATCH ERROR: 400 correct message when inc_votes is included, but as a invalid value (i.e. "string")', () => {
+          return request(app)
+            .patch("/api/comments/4")
+            .expect(400)
+            .send({ inc_votes: "UpVote" })
+            .then(res => {
+              expect(res.body.msg).to.equal("Invalid inc_votes value");
+            });
+        });
+        it("DELETE ERROR 404: Should give correct error when passed a valid, but non-existent comment_id", () => {
+          return request(app)
+            .delete("/api/comments/53")
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.equal("Comment Does Not Exist");
+            });
+        });
+        it("INVALID METHODS: STATUS 405", () => {
+          const invalidMethods = ["get", "put", "post"];
+          const methodPromises = invalidMethods.map(method => {
+            return request(app)
+              [method]("/api/comments/1")
+              .expect(405)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Method is not allowed");
+              });
+          });
+          return Promise.all(methodPromises);
         });
       });
     });
