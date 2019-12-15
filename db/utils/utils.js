@@ -18,16 +18,19 @@ exports.makeRefObj = (list, key, value) => {
 };
 
 exports.formatComments = (comments, articleRef) => {
-  if (!comments.length) return [];
-  else {
-    return comments.map(obj => {
-      const commentsCopy = { ...obj };
-      commentsCopy.author = obj.created_by;
-      commentsCopy.article_id = articleRef[obj.belongs_to];
-      commentsCopy.created_at = new Date(obj.created_at);
-      delete commentsCopy.belongs_to;
-      delete commentsCopy.created_by;
-      return commentsCopy;
-    });
-  }
+  return comments.map(
+    ({
+      ["belongs_to"]: key,
+      ["created_at"]: key2,
+      ["created_by"]: key3,
+      ...otherKeys
+    }) => {
+      return {
+        ["author"]: key3,
+        ["article_id"]: articleRef[key],
+        ["created_at"]: new Date(key2),
+        ...otherKeys
+      };
+    }
+  );
 };
