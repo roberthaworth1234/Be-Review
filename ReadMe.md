@@ -1,10 +1,11 @@
-# Rob Haworths Northcoders backend server project
+# Northcoders backend server project
 
 This server project has been created to showcase my ability to construct an API using TDD. My ability to use a PSQL database and interact using Knex. Please initialise my project and have a look at the different endpoint and utility functions etc.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+<!-- These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system. -->
+
 Once you have forked and downloaded the git repository. You will need to initialise the prerequisites below.
 
 ### Prerequisites
@@ -15,7 +16,7 @@ You will also need dependancies of pg / knex / express and chai sorted. These ar
 
 lastly you will need a knexfile.js which if you are a linux user, contains your password. Use the following code in the knexfile.
 
-```
+```js
 const ENV = process.env.NODE_ENV || "development";
 
 const baseConfig = {
@@ -50,7 +51,7 @@ module.exports = { ...customConfig[ENV], ...baseConfig };
 
 ### Installing
 
-A step by step series of examples that tell you how to get a development env running
+<!-- A step by step series of examples that tell you how to get a development env running
 
 Say what the step will be
 
@@ -64,7 +65,7 @@ And repeat
 until finished
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+End with an example of getting some data out of the system or using it for a little demo -->
 
 ## Running the tests
 
