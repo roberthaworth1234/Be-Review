@@ -34,12 +34,17 @@ const updateArticleById = (article_id, value = 0) => {
 
 const addCommentByArticleId = (article_id, postValue) => {
   const { username, body } = postValue;
-  return connection("comments")
-    .insert([{ author: username, body: body, article_id: article_id }])
-    .returning("*")
-    .then(result => {
-      return result[0];
-    });
+  if (username === undefined)
+    return Promise.reject({ status: 400, msg: "Invalid Post Input" });
+  return checkExists(null, null, article_id).then(res => {
+    if (res)
+      return connection("comments")
+        .insert([{ author: username, body: body, article_id: article_id }])
+        .returning("*")
+        .then(result => {
+          return result[0];
+        });
+  });
 };
 
 const fetchCommentsByArticleId = (

@@ -245,8 +245,17 @@ describe("app", () => {
       });
       it("POST ERROR: 400 bad request if post request does not contain all keys", () => {
         return request(app)
+          .post("/api/articles/1/comments")
+          .send({ body: "Comment body for posting" })
+          .expect(400)
+          .then(response => {
+            expect(response.body.msg).to.equal("Invalid Post Input");
+          });
+      });
+      it("POST ERROR: 400 bad request if post request does not contain a correct body, but does contain a correct username", () => {
+        return request(app)
           .post("/api/articles/4/comments")
-          .send({ username: "jimmy" })
+          .send({ username: "rogersop" })
           .expect(400)
           .then(response => {
             expect(response.body.msg).to.equal("Invalid Post Input");
@@ -261,7 +270,7 @@ describe("app", () => {
           })
           .expect(404)
           .then(response => {
-            expect(response.body.msg).to.equal("Article Id Invalid");
+            expect(response.body.msg).to.equal("article not found");
           });
       });
       it("POST ERROR: 400 should give correct error when posting incorrect input object(i.e. non-existent user)", () => {
@@ -276,16 +285,16 @@ describe("app", () => {
             expect(response.body.msg).to.equal("User Invalid");
           });
       });
-      it("POST ERROR: 400 should give correct error when posting with an article id which does not exist", () => {
+      it("POST ERROR: 404 should give correct error when posting with an article id which does not exist", () => {
         return request(app)
           .post("/api/articles/15/comments")
           .send({
             username: "butter_bridge",
             body: "comment post"
           })
-          .expect(400)
+          .expect(404)
           .then(response => {
-            expect(response.body.msg).to.equal("Article Id Invalid");
+            expect(response.body.msg).to.equal("article not found");
           });
       });
       it("GET 404: Not found message when given a valid but non-existent article_id", () => {
