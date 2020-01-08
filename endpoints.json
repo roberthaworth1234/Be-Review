@@ -23,5 +23,51 @@
         }
       ]
     }
+  },
+  "GET /api/users/:username": {
+    "description": "serves an user object containing the endpoint user information",
+    "queries": [],
+    "exampleResponse": {
+      "users": {
+        "username": "bobby",
+        "avatar_url": "https://i.imgur.com/WfX0Neu.jpg",
+        "name": "Bob"
+      }
+    }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves an article object containing the endpoint article information",
+    "queries": [],
+    "exampleResponse": {
+      "article": {
+        "article_id": 3,
+        "title": "React Projects",
+        "body": "React Project to be continued...",
+        "votes": 0,
+        "topic": "coding",
+        "author": "happyamy2016",
+        "created_at": "2017-07-21T17:54:10.346Z",
+        "comment_count": "10"
+      }
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "partially updates the endpoint article with the increment votes data provided",
+    "queries": [],
+    "exampleInput": {
+      "inc_votes": 5
+    },
+    "exampleResponse": {
+      "article": {
+        "article_id": 3,
+        "title": "React Projects",
+        "body": "React Project to be continued...",
+        "votes": 0,
+        "topic": "coding",
+        "author": "happyamy2016",
+        "created_at": "2017-07-21T17:54:10.346Z",
+        "comment_count": "15"
+      }
+    }
   }
 }
