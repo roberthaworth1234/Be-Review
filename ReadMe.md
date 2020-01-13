@@ -10,11 +10,13 @@ Once you have forked and downloaded the git repository. You will need to initial
 
 ### Prerequisites
 
-You will need devDependancies installed of mocha / chai and supertest. These are installed using terminal command - npm install mocha chai supertest -D.
+You will need devDependancies installed of mocha / chai and supertest. These are installed using terminal command - npm install mocha chai supertest -D (devDependancies).
 
-You will also need dependancies of pg / knex / express and chai sorted. These are installed using command - npm install excluding (-D) which is for devDependancies only.
+You will also need to npm install dependancies of pg / knex / express and chai sorted.
 
-lastly you will need a knexfile.js which if you are a linux user, contains your password. Use the following code in the knexfile.
+At this point it would be beneficial to run the setups-dbs script as this will create the nc_news_database on your local machine for running migrations.
+
+lastly you will need a knexfile.js which if you are a linux user, contains your password. Use the following code for your the knexfile.
 
 ```js
 const ENV = process.env.NODE_ENV || "development";
@@ -72,14 +74,6 @@ End with an example of getting some data out of the system or using it for a lit
 Running the automated tests for the API endpoints is simply npm test. This will run all tests on each endpoint available. Should you want to test the utility functions for migrations, use the command npm run test utils.
 
 ### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
 
 Explain what these tests test and why
 

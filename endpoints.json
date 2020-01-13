@@ -52,7 +52,7 @@
     }
   },
   "PATCH /api/articles/:article_id": {
-    "description": "partially updates the endpoint article with the increment votes data provided",
+    "description": "partially updates the endpoint article_id with the increment votes data provided",
     "queries": [],
     "exampleInput": {
       "inc_votes": 5
@@ -68,6 +68,33 @@
         "created_at": "2017-07-21T17:54:10.346Z",
         "comment_count": "15"
       }
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "post new comments to the endpoint article_id with the input provided",
+    "queries": [],
+    "exampleInput": {
+      "username": "butter_bridge",
+      "body": "Alex Ferguson is King!"
+    },
+    "exampleResponse": {
+      "comment": { "body": "Alex Ferguson is King!" }
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves up a comments object with an array of comments for the endpoint article_id",
+    "queries": ["sort_by", "order"],
+    "exampleResponse": {
+      "comment": [
+        {
+          "comment_id": 5,
+          "author": "grumpy",
+          "article_id": "1",
+          "votes": 10,
+          "created_at": "2017-11-20T08:58:48.322Z",
+          "body": "Hola camerrero. Si senor, que quere"
+        }
+      ]
     }
   }
 }
