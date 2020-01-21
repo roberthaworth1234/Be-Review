@@ -1,22 +1,36 @@
 # Northcoders backend server project
 
-This server project has been created to showcase my ability to construct an API using TDD. My ability to use a PSQL database and interact using Knex. Please initialise my project and have a look at the different endpoint and utility functions etc.
+This server project has been created to showcase my ability to construct an API using TDD. Migration and seeding of a SQL database, using PSQL and interacting using Knex. Please initialise my project and have a look at the different endpoints and utility functions etc.
 
 ## Getting Started
 
-<!-- These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system. -->
+Once you have forked and cloned the git repository. cd into the be-nc-news file. You will need to initialise the prerequisites below.
 
-Once you have forked and downloaded the git repository. You will need to initialise the prerequisites below.
+```
+git clone <forked repo url>
+```
 
 ### Prerequisites
 
-You will need devDependancies installed of mocha / chai and supertest. These are installed using terminal command - npm install mocha chai supertest -D (devDependancies).
+Install the dependencies using npm install
 
-You will also need to npm install dependancies of pg / knex / express and chai sorted.
+```
+npm install
+```
+
+If you would like to run my test files you will need devDependancies installed of mocha / chai and supertest. These are installed using terminal command - npm install mocha chai supertest -D (devDependancies).
+
+```
+npm install mocha chai supertest -D
+```
 
 At this point it would be beneficial to run the setups-dbs script as this will create the nc_news_database on your local machine for running migrations.
 
-lastly you will need a knexfile.js which if you are a linux user, contains your password. Use the following code for your the knexfile.
+```
+npm run setup-dbs
+```
+
+lastly you will need to create a knexfile.js still inside the be-nc-news file directory. Which will be your Knex config connection to the test or dev database.  If you are a linux user, contains your machines psql username and password. Use the following code for your the knexfile.
 
 ```js
 const ENV = process.env.NODE_ENV || "development";
@@ -51,27 +65,15 @@ const customConfig = {
 module.exports = { ...customConfig[ENV], ...baseConfig };
 ```
 
-### Installing
-
-<!-- A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo -->
-
 ## Running the tests
 
-Running the automated tests for the API endpoints is simply npm test. This will run all tests on each endpoint available. Should you want to test the utility functions for migrations, use the command npm run test utils.
+Running the automated tests for the API endpoints is simply npm test.  This will re-seed the data for each test, as not affect other tests in the suite.
+This will run all tests on each endpoint available. Should you want to test the utility functions used in manipulating the migration data, use the command npm run test-utils.
+
+```
+npm test
+npm run test-utils
+```
 
 ### Break down into end to end tests
 
@@ -85,29 +87,10 @@ Give an example
 
 Add additional notes about how to deploy this on a live system
 
-## Built With
+My deployed api url:
 
-- [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-- [Maven](https://maven.apache.org/) - Dependency Management
-- [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+https://rh-nc-news-api.herokuapp.com/api
 
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags).
-
-## Authors
-
-- **Billie Thompson** - _Initial work_ - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
 

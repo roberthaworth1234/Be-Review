@@ -35,7 +35,7 @@ describe("app", () => {
         });
         return Promise.all(methodPromises);
       });
-      it("GET: 200 should return correct status and the topics", () => {
+      it("GET: 200 returns correct status and the topics", () => {
         return request(app)
           .get("/api/topics")
           .expect(200)
@@ -47,7 +47,7 @@ describe("app", () => {
             expect(response.body.topics.length).to.equal(3);
           });
       });
-      it("GET ERROR:404 should give correct 404 error when topics spelt incorrectly", () => {
+      it("GET ERROR:404 gives correct 404 error when topics spelt incorrectly", () => {
         return request(app)
           .get("/api/topisc")
           .expect(404)
@@ -69,7 +69,7 @@ describe("app", () => {
         });
         return Promise.all(methodPromises);
       });
-      it("GET: 200 should get individual users by username", () => {
+      it("GET: 200 get individual users by username", () => {
         return request(app)
           .get("/api/users/butter_bridge")
           .expect(200)
@@ -116,7 +116,7 @@ describe("app", () => {
         });
         return Promise.all(methodPromises);
       });
-      it("GET: 200 should give correct status msg and response when getting articles by id", () => {
+      it("GET: 200 returns correct status msg and response when getting articles by id", () => {
         return request(app)
           .get("/api/articles/1")
           .expect(200)
@@ -197,7 +197,7 @@ describe("app", () => {
             expect(res.body.msg).to.equal("Invalid inc_votes value");
           });
       });
-      it("PATCH: 200 should return correct votes increase if some other property is added to the patch object", () => {
+      it("PATCH: 200 returns correct votes increase if some other property is added to the patch object", () => {
         return request(app)
           .patch("/api/articles/5")
           .expect(200)
@@ -221,7 +221,7 @@ describe("app", () => {
         });
         return Promise.all(methodPromises);
       });
-      it("POST: 201 should accept a post object with username and body and post the comment", () => {
+      it("POST: 201 accepts a post object with username and body and post the comment", () => {
         return request(app)
           .post("/api/articles/1/comments")
           .send({
@@ -261,7 +261,7 @@ describe("app", () => {
             expect(response.body.msg).to.equal("Invalid Post Input");
           });
       });
-      it("POST ERROR: 404 should give correct response when a post contains a valid article_id that doesnt exist", () => {
+      it("POST ERROR: 404 gives correct response when a post contains a valid article_id that doesnt exist", () => {
         return request(app)
           .post("/api/articles/1000/comments")
           .send({
@@ -273,7 +273,7 @@ describe("app", () => {
             expect(response.body.msg).to.equal("article not found");
           });
       });
-      it("POST ERROR: 400 should give correct error when posting incorrect input object(i.e. non-existent user)", () => {
+      it("POST ERROR: 400 returns correct error when posting incorrect input object(i.e. non-existent user)", () => {
         return request(app)
           .post("/api/articles/2/comments")
           .send({
@@ -285,7 +285,7 @@ describe("app", () => {
             expect(response.body.msg).to.equal("User Invalid");
           });
       });
-      it("POST ERROR: 404 should give correct error when posting with an article id which does not exist", () => {
+      it("POST ERROR: 404 returns correct error when posting with an article id which does not exist", () => {
         return request(app)
           .post("/api/articles/15/comments")
           .send({
@@ -305,7 +305,7 @@ describe("app", () => {
             expect(response.body.msg).to.equal("article not found");
           });
       });
-      it("GET 200: should return the comments relating to specific article id", () => {
+      it("GET 200: return the comments relating to specific article id", () => {
         return request(app)
           .get("/api/articles/9/comments")
           .expect(200)
@@ -322,7 +322,7 @@ describe("app", () => {
             expect(response.body.comments[0].comment_id).to.equal(1);
           });
       });
-      it("GET QUERY 200: should sortBy column name passed in the query", () => {
+      it("GET QUERY 200: returns sortBy column name passed in the query", () => {
         return request(app)
           .get("/api/articles/9/comments?sort_by=author")
           .expect(200)
@@ -332,7 +332,7 @@ describe("app", () => {
             });
           });
       });
-      it("GET QUERY 200: should be able to sort comments descending using an order query", () => {
+      it("GET QUERY 200: able to sort comments descending using an order query", () => {
         return request(app)
           .get("/api/articles/9/comments?order=asc")
           .expect(200)
@@ -342,7 +342,7 @@ describe("app", () => {
             });
           });
       });
-      it("GET QUERY 200: should be able to sort a specific comment by column and spicifying which order", () => {
+      it("GET QUERY 200: able to sort a specific comment by column and spicifying which order", () => {
         return request(app)
           .get("/api/articles/9/comments?sort_by=author&&order=desc")
           .expect(200)
@@ -352,7 +352,7 @@ describe("app", () => {
             });
           });
       });
-      it("GET QUERY 200: if passed an incorrect key name in the query, should sort by the default created_at", () => {
+      it("GET QUERY 200: if passed an incorrect key name in the query, sort by the default created_at", () => {
         return request(app)
           .get("/api/articles/9/comments?sort_b=author")
           .expect(200)
@@ -362,7 +362,7 @@ describe("app", () => {
             });
           });
       });
-      it("GET QUERY ERROR 400: if passed an incorrect value into the query, should return with not found", () => {
+      it("GET QUERY ERROR 400: if passed an incorrect value into the query, returns with not found", () => {
         return request(app)
           .get("/api/articles/9/comments?sort_by=auth")
           .expect(400)
@@ -370,7 +370,7 @@ describe("app", () => {
             expect(response.body.msg).to.equal("Query Request Invalid");
           });
       });
-      it("GET QUERY 200: should still sortby author if order value is incorrectly passed", () => {
+      it("GET QUERY 200: returns sortby author if order value is incorrectly passed", () => {
         return request(app)
           .get("/api/articles/1/comments?sort_by=author&order=ac")
           .expect(200)
@@ -380,7 +380,7 @@ describe("app", () => {
             });
           });
       });
-      it("GET QUERY ERROR 400: should give a correct error when query built incorrectly", () => {
+      it("GET QUERY ERROR 400: gives a correct error when query built incorrectly", () => {
         return request(app)
           .get("/api/articles/1/comments?sort_by=authororder=asc")
           .expect(400)
@@ -390,7 +390,7 @@ describe("app", () => {
       });
     });
     describe("GET articles ?queries", () => {
-      it("GET 200: should articles by valid column, defaulting to the date column", () => {
+      it("GET 200: returns articles by valid column, defaulting to the date column", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
@@ -438,7 +438,7 @@ describe("app", () => {
             });
           });
       });
-      it("GET QUERY 200: should return all articles specified by the author username", () => {
+      it("GET QUERY 200: return all articles specified by the author username", () => {
         return request(app)
           .get("/api/articles?author=rogersop")
           .expect(200)
@@ -447,7 +447,7 @@ describe("app", () => {
             expect(response.body.articles[0].author).to.equal("rogersop");
           });
       });
-      it("GET QUERY 200: should return all articles specified by the topics", () => {
+      it("GET QUERY 200: returns all articles specified by the topics", () => {
         return request(app)
           .get("/api/articles?topic=cats")
           .expect(200)
@@ -455,7 +455,7 @@ describe("app", () => {
             expect(response.body.articles.length).to.equal(1);
           });
       });
-      it("GET QUERY 200: should give correct empty array when author requested who has written no articles", () => {
+      it("GET QUERY 200: gives correct empty array when author requested who has written no articles", () => {
         return request(app)
           .get("/api/articles?author=lurker")
           .expect(200)
@@ -463,7 +463,7 @@ describe("app", () => {
             expect(response.body.articles).to.eql([]);
           });
       });
-      it("GET QUERY ERROR 404: should give correct error when author is not a valid user", () => {
+      it("GET QUERY ERROR 404: gives correct error when author is not a valid user", () => {
         return request(app)
           .get("/api/articles?author=luker")
           .expect(404)
@@ -471,7 +471,7 @@ describe("app", () => {
             expect(response.body.msg).to.eql("user not found");
           });
       });
-      it("GET QUERY ERROR 404: should give correct error when topic is not valid/present", () => {
+      it("GET QUERY ERROR 404: gives correct error when topic is not valid/present", () => {
         return request(app)
           .get("/api/articles?topic=wrong")
           .expect(404)
@@ -479,7 +479,7 @@ describe("app", () => {
             expect(response.body.msg).to.eql("topic not found");
           });
       });
-      it("GET QUERY ERROR 404: should give correct error when topic is given as a number", () => {
+      it("GET QUERY ERROR 404: gives correct error when topic is given as a number", () => {
         return request(app)
           .get("/api/articles?topic=12")
           .expect(404)
@@ -487,7 +487,7 @@ describe("app", () => {
             expect(response.body.msg).to.eql("topic not found");
           });
       });
-      it("GET QUERY ERROR 404: should give correct error when author is given as a number instead of a string", () => {
+      it("GET QUERY ERROR 404: returns correct error when author is given as a number instead of a string", () => {
         return request(app)
           .get("/api/articles?author=2")
           .expect(404)
@@ -498,7 +498,7 @@ describe("app", () => {
     });
 
     describe("/comments/comments:id", () => {
-      it("PATCH 200: should increment a comments vote by 1", () => {
+      it("PATCH 200: increments a comments vote by 1", () => {
         return request(app)
           .patch("/api/comments/2")
           .send({ inc_votes: 1 })
@@ -516,7 +516,7 @@ describe("app", () => {
             expect(response.body.comment.comment_id).to.equal(2);
           });
       });
-      it("PATCH 200: should decrement inc votes by -1 value", () => {
+      it("PATCH 200: decreases inc votes by -1 value", () => {
         return request(app)
           .patch("/api/comments/5")
           .expect(200)
@@ -526,7 +526,7 @@ describe("app", () => {
             expect(response.body.comment.comment_id).to.equal(5);
           });
       });
-      it("PATCH 200: should decrement inc votes by 1, even if orginal votes value is a negative value", () => {
+      it("PATCH 200: decreases inc votes by 1, even if orginal votes value is a negative value", () => {
         return request(app)
           .patch("/api/comments/4")
           .expect(200)
@@ -544,7 +544,7 @@ describe("app", () => {
             expect(response.body.comment.votes).to.equal(100);
           });
       });
-      it("PATCH ERROR 404: should return correct error when patch contains a valid but non existent id", () => {
+      it("PATCH ERROR 404: returns correct error when patch contains a valid but non existent id", () => {
         return request(app)
           .patch("/api/comments/1001")
           .send({ inc_votes: 2 })
@@ -553,7 +553,7 @@ describe("app", () => {
             expect(response.body.msg).to.equal("Invalid Comment Id");
           });
       });
-      it("DELETE 204: should give a 204 no content when comment is deleted by id", () => {
+      it("DELETE 204: gives a 204 no content when comment is deleted by id", () => {
         return request(app)
           .delete("/api/comments/2")
           .expect(204);
@@ -567,7 +567,7 @@ describe("app", () => {
             expect(res.body.msg).to.equal("Invalid inc_votes value");
           });
       });
-      it("DELETE ERROR 404: Should give correct error when passed a valid, but non-existent comment_id", () => {
+      it("DELETE ERROR 404: returns correct error when passed a valid, but non-existent comment_id", () => {
         return request(app)
           .delete("/api/comments/53")
           .expect(404)
