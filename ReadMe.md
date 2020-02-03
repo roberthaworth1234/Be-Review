@@ -8,6 +8,7 @@ Once you have forked and cloned the git repository. cd into the be-nc-news file.
 
 ```
 git clone <forked repo url>
+cd be-nc-news
 ```
 
 ### Prerequisites
@@ -30,7 +31,7 @@ At this point it would be beneficial to run the setups-dbs script as this will c
 npm run setup-dbs
 ```
 
-lastly you will need to create a knexfile.js still inside the be-nc-news file directory. Which will be your Knex config connection to the test or dev database.  If you are a linux user, contains your machines psql username and password. Use the following code for your the knexfile.
+lastly you will need to create a knexfile.js, inside the be-nc-news file directory. Which will be your Knex config connection to the test or dev database.  If you are a linux user, this will contain your username and password. Use the following code for your the knexfile.
 
 ```js
 const ENV = process.env.NODE_ENV || "development";
@@ -67,7 +68,7 @@ module.exports = { ...customConfig[ENV], ...baseConfig };
 
 ## Running the tests
 
-Running the automated tests for the API endpoints is simply npm test.  This will re-seed the data for each test, as not affect other tests in the suite.
+Running the automated tests for the API is simply npm test.  This will re-seed the data for each test, as not affect other tests in the suite.
 This will run all tests on each endpoint available. Should you want to test the utility functions used in manipulating the migration data, use the command npm run test-utils.
 
 ```
@@ -75,25 +76,14 @@ npm test
 npm run test-utils
 ```
 
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
 
 My deployed api url:
 
 https://rh-nc-news-api.herokuapp.com/api
 
 
-## Acknowledgments
 
-- Hat tip to anyone whose code was used
-- Inspiration
-- etc
+
